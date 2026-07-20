@@ -7,6 +7,16 @@ dotenv.config();
 
 const app = express();
 
+const authRoutes = require("./routes/authRoutes");
+
+app.use("/api/auth", authRoutes);
+
+const cors = require('cors');
+app.use(cors({
+  origin: "https://localhost:5173",
+  credentials: true
+}));
+
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
@@ -21,6 +31,16 @@ app.get('/test', (req, res) => {
     status: 'success',
     timestamp: new Date()
     });
+});
+
+
+const { protect } = require("./middleware/authMiddleware");
+
+app.get("/api/protected", protect, (req, res) => {
+  res.json({
+    message: `Welcome, user ${req.user.id}! You have accessed protected data.`,
+    timestamp: new Date()
+  });
 });
 
 module.exports = app;
