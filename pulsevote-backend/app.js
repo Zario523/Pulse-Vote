@@ -7,34 +7,29 @@ dotenv.config();
 
 const app = express();
 
-const authRoutes = require("./routes/authRoutes");
-
-app.use("/api/auth", authRoutes);
-
-const cors = require('cors');
+app.use(helmet());
 app.use(cors({
   origin: "https://localhost:5173",
   credentials: true
 }));
-
-app.use(helmet());
-app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
-res.send('PulseVote API running!');
+  res.send('PulseVote API running!');
 });
 
 app.get('/test', (req, res) => {
-    res.json({
+  res.json({
     message: 'This is a test endpoint from PulseVote API!',
     status: 'success',
     timestamp: new Date()
-    });
+  });
 });
 
+const authRoutes = require("./routes/authRoutes");
+app.use("/api/auth", authRoutes);
 
-const { protect } = require("./middleware/authMiddleware");
+const { protect } = require("./Middleware/authMiddleware.js");
 
 app.get("/api/protected", protect, (req, res) => {
   res.json({
