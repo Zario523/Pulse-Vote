@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { isValidEmail, isStrongPassword } from "../utils/validators";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -14,13 +15,20 @@ export default function Login() {
     setError("");
     setSuccess("");
 
+    if (!email || !password) {
+      setError("Email and password are required.");
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      setError("Invalid email format.");
+      return;
+    }
+
     try {
       const response = await axios.post(
         "https://localhost:5000/api/auth/login",
-        {
-          email,
-          password
-        }
+        { email, password }
       );
 
       localStorage.setItem("token", response.data.token);
@@ -54,12 +62,14 @@ export default function Login() {
       <input
         type="email"
         placeholder="Email"
+        value={email}
         onChange={(event) => setEmail(event.target.value)}
       />
 
       <input
         type="password"
         placeholder="Password"
+        value={password}
         onChange={(event) => setPassword(event.target.value)}
       />
 
