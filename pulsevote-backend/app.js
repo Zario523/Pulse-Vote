@@ -8,6 +8,18 @@ dotenv.config();
 const app = express();
 
 app.use(helmet());
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "https://apis.google.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:"],
+      connectSrc: ["'self'", "https://localhost:5000"],
+    },
+  })
+);
 app.use(cors({
   origin: "https://localhost:5173",
   credentials: true
@@ -29,7 +41,13 @@ app.get('/test', (req, res) => {
 const authRoutes = require("./routes/authRoutes");
 app.use("/api/auth", authRoutes);
 
-const { protect } = require("./Middleware/authMiddleware.js");
+const organisationRoutes = require("./routes/organisationRoutes");
+app.use("/api/organisations", organisationRoutes);
+
+const { protect } = require("./middleware/authMiddleware");
+
+const pollRoutes = require("./routes/pollRoutes");
+app.use("/api/polls", pollRoutes);
 
 app.get("/api/protected", protect, (req, res) => {
   res.json({
